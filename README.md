@@ -92,4 +92,4 @@ This chatbot is a supportive tool and should not replace professional mental hea
 This system is designed to be a screening tool only and should not be used as a replacement for professional medical advice. All data is handled with strict privacy considerations.
 
 ## Project Information
-This is an Intern Project Made For NIPIX TECHNOLOGIES
+This is an Intern Project Made For NIPIX TECHNOLOGIES.
