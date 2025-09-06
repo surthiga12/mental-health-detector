@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindScan AI - Mental Health Support</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Custom animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        @keyframes typing {
+            0%, 80%, 100% { 
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            40% { 
+                transform: scale(1.2);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .animate-fadeInUp { animation: fadeInUp 0.6s ease-out; }
+        .animate-pulse-slow { animation: pulse 2s infinite; }
+        .animate-typing { animation: typing 1.5s infinite; }
+        .animate-slideInRight { animation: slideInRight 0.5s ease-out; }
+        .animate-slideInLeft { animation: slideInLeft 0.5s ease-out; }
+        
+        /* Custom gradient backgrounds */
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .gradient-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .gradient-success {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .gradient-warning {
+            background: linear-gradient(135deg, #fdbb2d 0%, #22c1c3 100%);
+        }
+        
+        .gradient-danger {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        }
+        
+        /* Chat bubble styles */
+        .chat-bubble-user {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 18px 18px 4px 18px;
+        }
+        
+        .chat-bubble-ai {
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 18px 18px 18px 4px;
+        }
+        
+        /* Risk level indicators */
+        .risk-normal { border-left: 4px solid #48bb78; }
+        .risk-moderate { border-left: 4px solid #ed8936; }
+        .risk-high { border-left: 4px solid #f56565; }
+        
+        /* Scrollbar styling */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+        
+        /* Typing indicator */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            gap: 10px;
+        }
+        
+        .typing-dots {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .typing-indicator .dot {
+            height: 10px;
+            width: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: inline-block;
+            animation: typing 1.6s infinite ease-in-out both;
+            box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+        }
+        
+        .typing-indicator .dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator .dot:nth-child(2) { animation-delay: -0.16s; }
+        .typing-indicator .dot:nth-child(3) { animation-delay: 0s; }
+        
+        .typing-text {
+            color: #6b7280;
+            font-size: 0.875rem;
+            font-weight: 500;
+            font-style: italic;
+        }
+        
+        /* Glassmorphism effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Floating action button */
+        .fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-white bg-opacity-20 p-2 rounded-full">
+                        <i class="fas fa-brain text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold">MindScan AI</h1>
+                        <p class="text-sm opacity-90">Your Mental Health Companion</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="hidden md:flex items-center space-x-2 bg-white bg-opacity-20 px-3 py-1 rounded-full">
+                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        <span class="text-sm">AI Online</span>
+                    </div>
+                    <button class="bg-white bg-opacity-20 p-2 rounded-full hover:bg-opacity-30 transition-all" onclick="toggleSettings()">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Chat Container -->
+    <div class="container mx-auto px-4 py-6 max-w-4xl">
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <!-- Chat Status Bar -->
+            <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                        <span class="font-medium">Mental Health Assessment Active</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm opacity-90" id="messageCount">0 messages</span>
+                        <div class="w-px h-4 bg-white opacity-30"></div>
+                        <span class="text-sm opacity-90" id="riskLevel">Normal</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Messages Area -->
+            <div id="chatMessages" class="h-96 overflow-y-auto p-6 space-y-4 custom-scrollbar bg-gradient-to-b from-gray-50 to-white">
+                <!-- Welcome Message -->
+                <div class="animate-fadeInUp">
+                    <div class="flex items-start space-x-3">
+                        <div class="flex-shrink-0">
+                            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white">
+                                <i class="fas fa-robot text-sm"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow">
+                            <div class="chat-bubble-ai p-4 max-w-md">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <span class="font-medium text-gray-700">MindScan AI</span>
+                                    <span class="text-xs text-gray-500">Now</span>
+                                </div>
+                                <p class="text-gray-700 leading-relaxed">
+                                    Hello! I'm here to provide mental health support and listen to whatever you'd like to share. 
+                                    How are you feeling today? 😊
+                                </p>
+                                <div class="mt-3 flex items-center space-x-2">
+                                    <div class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium risk-normal">
+                                        Normal Risk
+                                    </div>
+                                    <div class="text-xs text-gray-500">Confidence: 85%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Typing Indicator (hidden by default) -->
+            <div id="typingIndicator" class="px-6 py-2 hidden">
+                <div class="flex items-start space-x-3 animate-slideInLeft">
+                    <div class="flex-shrink-0">
+                        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white shadow-lg">
+                            <i class="fas fa-robot text-sm"></i>
+                        </div>
+                    </div>
+                    <div class="max-w-xs lg:max-w-md px-4 py-3 rounded-2xl bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 shadow-sm">
+                        <div class="typing-indicator">
+                            <div class="typing-dots">
+                                <span class="dot"></span>
+                                <span class="dot"></span>
+                                <span class="dot"></span>
+                            </div>
+                            <span class="typing-text">MindScan is thinking...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="border-t bg-white p-6">
+                <div class="flex items-end space-x-4">
+                    <div class="flex-grow">
+                        <div class="relative">
+                            <textarea 
+                                id="messageInput" 
+                                placeholder="Share your thoughts and feelings... I'm here to listen 💭"
+                                class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none transition-all duration-200"
+                                rows="1"
+                                maxlength="1000"></textarea>
+                            <div class="absolute bottom-3 right-3 text-xs text-gray-400" id="charCount">0/1000</div>
+                        </div>
+                        <div class="mt-2 flex items-center space-x-4">
+                            <button class="flex items-center space-x-1 text-gray-500 hover:text-blue-500 transition-colors">
+                                <i class="fas fa-microphone text-sm"></i>
+                                <span class="text-sm">Voice</span>
+                            </button>
+                            <button class="flex items-center space-x-1 text-gray-500 hover:text-blue-500 transition-colors">
+                                <i class="fas fa-image text-sm"></i>
+                                <span class="text-sm">Image</span>
+                            </button>
+                            <button class="flex items-center space-x-1 text-gray-500 hover:text-blue-500 transition-colors">
+                                <i class="fas fa-smile text-sm"></i>
+                                <span class="text-sm">Emoji</span>
+                            </button>
+                        </div>
+                    </div>
+                    <button 
+                        id="sendButton"
+                        class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white p-3 rounded-full transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fas fa-paper-plane text-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mental Health Insights Panel -->
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Current Mood -->
+            <div class="bg-white rounded-xl shadow-lg p-6 animate-fadeInUp">
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-10 h-10 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-800">Current Mood</h3>
+                </div>
+                <div id="moodDisplay" class="text-center">
+                    <div class="text-3xl mb-2">😊</div>
+                    <div class="text-lg font-medium text-gray-700" id="moodText">Neutral</div>
+                    <div class="text-sm text-gray-500 mt-1" id="moodConfidence">Confidence: 85%</div>
+                </div>
+            </div>
+
+            <!-- Risk Assessment -->
+            <div class="bg-white rounded-xl shadow-lg p-6 animate-fadeInUp" style="animation-delay: 0.1s;">
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-white">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-800">Risk Level</h3>
+                </div>
+                <div id="riskDisplay" class="text-center">
+                    <div class="text-2xl font-bold text-green-600 mb-2" id="riskValue">LOW</div>
+                    <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
+                        <div id="riskBar" class="bg-green-500 h-2 rounded-full transition-all duration-300" style="width: 25%"></div>
+                    </div>
+                    <div class="text-sm text-gray-500" id="riskDescription">You're doing well!</div>
+                </div>
+            </div>
+
+            <!-- Conversation Stats -->
+            <div class="bg-white rounded-xl shadow-lg p-6 animate-fadeInUp" style="animation-delay: 0.2s;">
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center text-white">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-800">Session Stats</h3>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Messages</span>
+                        <span class="font-medium" id="statsMessages">0</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Duration</span>
+                        <span class="font-medium" id="statsDuration">0m</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Trend</span>
+                        <span class="font-medium" id="statsTrend">Stable</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Suggestions -->
+        <div class="mt-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Quick Start Suggestions</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button class="suggestion-btn bg-white hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded-xl p-4 text-left transition-all duration-200 transform hover:scale-105" onclick="sendSuggestion('I\'m feeling anxious about work today')">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-briefcase text-blue-600 text-sm"></i>
+                        </div>
+                        <span class="text-gray-700">"I'm feeling anxious about work today"</span>
+                    </div>
+                </button>
+                <button class="suggestion-btn bg-white hover:bg-green-50 border border-gray-200 hover:border-green-300 rounded-xl p-4 text-left transition-all duration-200 transform hover:scale-105" onclick="sendSuggestion('I need help with stress management')">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-leaf text-green-600 text-sm"></i>
+                        </div>
+                        <span class="text-gray-700">"I need help with stress management"</span>
+                    </div>
+                </button>
+                <button class="suggestion-btn bg-white hover:bg-purple-50 border border-gray-200 hover:border-purple-300 rounded-xl p-4 text-left transition-all duration-200 transform hover:scale-105" onclick="sendSuggestion('I\'m having relationship problems')">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-heart text-purple-600 text-sm"></i>
+                        </div>
+                        <span class="text-gray-700">"I'm having relationship problems"</span>
+                    </div>
+                </button>
+                <button class="suggestion-btn bg-white hover:bg-yellow-50 border border-gray-200 hover:border-yellow-300 rounded-xl p-4 text-left transition-all duration-200 transform hover:scale-105" onclick="sendSuggestion('I feel lonely and isolated')">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-yellow-600 text-sm"></i>
+                        </div>
+                        <span class="text-gray-700">"I feel lonely and isolated"</span>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Emergency Support Button -->
+    <button class="fab bg-red-500 hover:bg-red-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center" onclick="showEmergencySupport()">
+        <i class="fas fa-phone text-xl"></i>
+    </button>
+
+    <!-- Emergency Support Modal -->
+    <div id="emergencyModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 animate-fadeInUp">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Need Immediate Help?</h3>
+                <p class="text-gray-600">If you're in crisis, please reach out for immediate support.</p>
+            </div>
+            <div class="space-y-3">
+                <a href="tel:1056" class="block w-full bg-red-500 hover:bg-red-600 text-white text-center py-3 rounded-xl font-medium transition-colors">
+                    <i class="fas fa-phone mr-2"></i>Call 1056 (KIRAN Mental Health)
+                </a>
+                <a href="tel:112" class="block w-full bg-orange-500 hover:bg-orange-600 text-white text-center py-3 rounded-xl font-medium transition-colors">
+                    <i class="fas fa-ambulance mr-2"></i>Call 112 (Emergency)
+                </a>
+                <a href="tel:9152987821" class="block w-full bg-purple-500 hover:bg-purple-600 text-white text-center py-3 rounded-xl font-medium transition-colors">
+                    <i class="fas fa-heart mr-2"></i>Call 9152987821 (Suicide Prevention)
+                </a>
+                <button onclick="sendSuggestion('I need immediate help and support')" class="block w-full bg-blue-500 hover:bg-blue-600 text-white text-center py-3 rounded-xl font-medium transition-colors">
+                    <i class="fas fa-comments mr-2"></i>Talk to AI Now
+                </button>
+            </div>
+            <button onclick="hideEmergencySupport()" class="w-full mt-4 py-2 text-gray-500 hover:text-gray-700 transition-colors">
+                Close
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let messageCount = 0;
+        let sessionStartTime = Date.now();
+        let currentRisk = 'normal';
+
+        // DOM Elements
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const chatMessages = document.getElementById('chatMessages');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const charCount = document.getElementById('charCount');
+
+        // Initialize chat
+        document.addEventListener('DOMContentLoaded', function() {
+            messageInput.focus();
+            updateSessionStats();
+            setInterval(updateSessionStats, 30000); // Update every 30 seconds
+        });
+
+        // Character counter
+        messageInput.addEventListener('input', function() {
+            const count = this.value.length;
+            charCount.textContent = `${count}/1000`;
+            
+            if (count > 900) {
+                charCount.classList.add('text-red-500');
+            } else {
+                charCount.classList.remove('text-red-500');
+            }
+            
+            // Auto-resize textarea
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+
+        // Send message on Enter (but not Shift+Enter)
+        messageInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Send message function
+        sendButton.addEventListener('click', sendMessage);
+
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            // Add user message to chat
+            addMessage(message, 'user');
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+            charCount.textContent = '0/1000';
+
+            // Show typing indicator
+            showTypingIndicator();
+
+            // Send to backend
+            fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideTypingIndicator();
+                addMessage(data.chatbot_response, 'ai', data.assessment);
+                updateMoodDisplay(data.assessment);
+                updateRiskDisplay(data.assessment);
+                messageCount++;
+                updateSessionStats();
+            })
+            .catch(error => {
+                hideTypingIndicator();
+                addMessage('I apologize, but I\'m having trouble connecting right now. Please try again.', 'ai', { risk_level: 'normal', confidence: 0.5 });
+                console.error('Error:', error);
+            });
+        }
+
+        function addMessage(message, sender, assessment = null) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = sender === 'user' ? 'animate-slideInRight' : 'animate-slideInLeft';
+            
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            if (sender === 'user') {
+                messageDiv.innerHTML = `
+                    <div class="flex items-start space-x-3 justify-end">
+                        <div class="flex-grow">
+                            <div class="chat-bubble-user text-white p-4 max-w-md ml-auto">
+                                <div class="flex items-center space-x-2 mb-2 justify-end">
+                                    <span class="text-xs text-white opacity-75">${time}</span>
+                                    <span class="font-medium">You</span>
+                                </div>
+                                <p class="leading-relaxed">${message}</p>
+                            </div>
+                        </div>
+                        <div class="flex-shrink-0">
+                            <div class="w-10 h-10 bg-gradient-to-br from-gray-400 to-gray-600 rounded-full flex items-center justify-center text-white">
+                                <i class="fas fa-user text-sm"></i>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                const riskClass = assessment ? `risk-${assessment.risk_level}` : 'risk-normal';
+                const riskColor = assessment ? getRiskColor(assessment.risk_level) : 'green';
+                const confidence = assessment ? Math.round(assessment.confidence * 100) : 85;
+                
+                messageDiv.innerHTML = `
+                    <div class="flex items-start space-x-3">
+                        <div class="flex-shrink-0">
+                            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white">
+                                <i class="fas fa-robot text-sm"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow">
+                            <div class="chat-bubble-ai p-4 max-w-md ${riskClass}">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <span class="font-medium text-gray-700">MindScan AI</span>
+                                    <span class="text-xs text-gray-500">${time}</span>
+                                </div>
+                                <p class="text-gray-700 leading-relaxed">${message}</p>
+                                ${assessment ? `
+                                    <div class="mt-3 flex items-center space-x-2">
+                                        <div class="px-2 py-1 bg-${riskColor}-100 text-${riskColor}-700 rounded-full text-xs font-medium">
+                                            ${assessment.risk_level.charAt(0).toUpperCase() + assessment.risk_level.slice(1)} Risk
+                                        </div>
+                                        <div class="text-xs text-gray-500">Confidence: ${confidence}%</div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            typingIndicator.classList.remove('hidden');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            typingIndicator.classList.add('hidden');
+        }
+
+        function getRiskColor(riskLevel) {
+            switch(riskLevel) {
+                case 'high': return 'red';
+                case 'moderate': return 'yellow';
+                default: return 'green';
+            }
+        }
+
+        function updateMoodDisplay(assessment) {
+            const moodEmojis = {
+                'normal': '😊',
+                'moderate': '😐',
+                'high': '😟'
+            };
+            
+            const moodTexts = {
+                'normal': 'Positive',
+                'moderate': 'Concerned',
+                'high': 'Distressed'
+            };
+            
+            if (assessment) {
+                document.getElementById('moodDisplay').querySelector('.text-3xl').textContent = moodEmojis[assessment.risk_level] || '😊';
+                document.getElementById('moodText').textContent = moodTexts[assessment.risk_level] || 'Neutral';
+                document.getElementById('moodConfidence').textContent = `Confidence: ${Math.round(assessment.confidence * 100)}%`;
+            }
+        }
+
+        function updateRiskDisplay(assessment) {
+            if (!assessment) return;
+            
+            const riskValue = document.getElementById('riskValue');
+            const riskBar = document.getElementById('riskBar');
+            const riskDescription = document.getElementById('riskDescription');
+            
+            const riskData = {
+                'normal': { text: 'LOW', width: '25%', color: 'green', desc: 'You\'re doing well!' },
+                'moderate': { text: 'MODERATE', width: '60%', color: 'yellow', desc: 'Some concerns noted' },
+                'high': { text: 'HIGH', width: '90%', color: 'red', desc: 'Please seek support' }
+            };
+            
+            const data = riskData[assessment.risk_level] || riskData['normal'];
+            
+            riskValue.textContent = data.text;
+            riskValue.className = `text-2xl font-bold text-${data.color}-600 mb-2`;
+            riskBar.style.width = data.width;
+            riskBar.className = `bg-${data.color}-500 h-2 rounded-full transition-all duration-300`;
+            riskDescription.textContent = data.desc;
+            
+            currentRisk = assessment.risk_level;
+        }
+
+        function updateSessionStats() {
+            const duration = Math.floor((Date.now() - sessionStartTime) / 60000);
+            document.getElementById('statsMessages').textContent = messageCount;
+            document.getElementById('statsDuration').textContent = `${duration}m`;
+            document.getElementById('messageCount').textContent = `${messageCount} messages`;
+            document.getElementById('riskLevel').textContent = currentRisk.charAt(0).toUpperCase() + currentRisk.slice(1);
+        }
+
+        function sendSuggestion(text) {
+            messageInput.value = text;
+            sendMessage();
+        }
+
+        function showEmergencySupport() {
+            document.getElementById('emergencyModal').classList.remove('hidden');
+        }
+
+        function hideEmergencySupport() {
+            document.getElementById('emergencyModal').classList.add('hidden');
+        }
+
+        function toggleSettings() {
+            // Settings modal functionality can be added here
+            alert('Settings panel coming soon!');
+        }
+
+        // Hide suggestions after first message
+        messageInput.addEventListener('input', function() {
+            if (messageCount === 0 && this.value.length > 0) {
+                document.querySelectorAll('.suggestion-btn').forEach(btn => {
+                    btn.style.opacity = '0.5';
+                });
+            }
+        });
+    </script>
+</body>
+</html>
